@@ -2,7 +2,18 @@ use crate::state::State;
 
 // Any block can be identified by the pc, mode bits and thumb bit.
 // To encode this efficiently we use a u64.
+#[derive(Clone, Copy, Debug)]
 pub struct BlockDescriptor(u64);
+
+impl BlockDescriptor {
+    pub fn addr(&self) -> u32 {
+        (self.0 as u32 & 0x7fffffff) << 1
+    }
+
+    pub fn is_arm(&self) -> bool {
+        (self.0 >> 36) & 0x1 == 0
+    }
+}
 
 impl From<&State> for BlockDescriptor {
     fn from(state: &State) -> Self {

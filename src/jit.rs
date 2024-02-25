@@ -1,4 +1,4 @@
-use crate::{block_descriptor::BlockDescriptor, config::Config, guest_memory::GuestMemory, state::State};
+use crate::{block_descriptor::BlockDescriptor, config::Config, guest_memory::GuestMemory, ir::block::Block, state::State};
 
 pub struct Jit<T: GuestMemory> {
     config: Config,
@@ -20,6 +20,7 @@ impl<T: GuestMemory> Jit<T> {
     pub fn run(&mut self, cycles: usize) {
         for _ in 0..cycles {
             let descriptor = BlockDescriptor::from(&self.state);
+            let block = self.translate(descriptor);
             // lookup block based on current state to form descriptor
             // if block doesn't exist, then compile new block
 
@@ -40,6 +41,23 @@ impl<T: GuestMemory> Jit<T> {
         }
         let pc = self.state.gpr[15];
         todo!()
+    }
+
+    fn translate(&self, descriptor: BlockDescriptor) -> Block {
+        println!("{:?}", descriptor);
+        for i in 0..self.config.block_size_limit {
+            let addr = descriptor.addr();
+            if descriptor.is_arm() {
+                let data = self.memory.read_word(addr);
+                todo!("data {:#08x}", data)
+            } else {
+                todo!("handle thumb")
+            }
+        }
+
+        Block {
+
+        }
     }
 
     pub fn state(&self) -> &State {

@@ -5,16 +5,16 @@ struct CodeMemory {
 }
 
 impl GuestMemory for CodeMemory {
-    fn read_byte(addr: u32) -> u8 {
+    fn read_byte(&self, addr: u32) -> u8 {
         todo!()
     }
 
-    fn read_half(addr: u32) -> u16 {
+    fn read_half(&self, addr: u32) -> u16 {
         todo!()
     }
 
-    fn read_word(addr: u32) -> u32 {
-        todo!()
+    fn read_word(&self, addr: u32) -> u32 {
+        self.code[addr as usize / 4]
     }
 }
 

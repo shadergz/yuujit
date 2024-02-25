@@ -5,3 +5,4 @@ pub mod jit;
 pub mod state;
 pub mod block_descriptor;
 pub mod ir;
+pub mod decoder;
