@@ -1,5 +1,5 @@
-use super::instructions::ArmDataProcessing;
+use super::instructions::DataProcessing;
 
 pub trait Visitor {
-    fn arm_data_processing(&mut self, inst: ArmDataProcessing);
+    fn arm_data_processing(&mut self, inst: DataProcessing);
 }

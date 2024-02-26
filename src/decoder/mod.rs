@@ -3,7 +3,7 @@ pub mod instructions;
 
 use crate::decoder::visitor::Visitor;
 
-use self::instructions::{ArmDataProcessing, ArmInstructionType};
+use self::instructions::{DataProcessing, ArmInstructionType};
 
 const fn build_pattern_mask(pattern: &'static str) -> u32 {
     let mut mask = 0;
@@ -46,15 +46,37 @@ pub struct Decoder {
 impl Decoder {
     pub fn new() -> Self {
         Self {
-            arm_table: [ArmInstructionType::Illegal; 4096],
+            arm_table: Self::build_arm_table(),
         }
+    }
+
+    const fn build_arm_table() -> [ArmInstructionType; 4096] {
+        let mut arm_table = [ArmInstructionType::Illegal; 4096];
+        let mut i = 0;
+        while i < arm_table.len() {
+            if Self::matches_pattern(i, "....00..........................") {
+                arm_table[i] = ArmInstructionType::DataProcessing;
+            } else {
+                arm_table[i] = ArmInstructionType::Illegal;
+            }
+
+            i += 1;
+        }
+
+        arm_table
+    }
+
+    const fn matches_pattern(table_index: usize, pattern: &'static str) -> bool {
+        let mask = Self::arm_index(build_pattern_mask(pattern));
+        let value = Self::arm_index(build_pattern_value(pattern));
+        table_index & mask == value
     }
 
     pub fn call_arm<V: Visitor>(&self, inst: u32, visitor: &mut V) {
         println!("{:#08x}", inst);
         let index = Self::arm_index(inst);
         match self.arm_table[index] {
-            ArmInstructionType::DataProcessing => visitor.arm_data_processing(ArmDataProcessing::from(inst)),
+            ArmInstructionType::DataProcessing => visitor.arm_data_processing(DataProcessing::from(inst)),
             ArmInstructionType::Illegal => todo!(),
         }
     }

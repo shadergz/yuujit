@@ -23,9 +23,7 @@ impl<T: GuestMemory> Jit<T> {
         for _ in 0..cycles {
             let descriptor = BlockDescriptor::from(&self.state);
 
-            let mut translator = Translator {
-
-            };
+            let mut translator = Translator::new();
 
             for i in 0..self.config.block_size_limit {
                 let addr = descriptor.addr();
@@ -58,7 +56,7 @@ impl<T: GuestMemory> Jit<T> {
 
             // there's no need to cache the basic blocks, as they get compiled into something else later on
         }
-        
+
         todo!()
     }
 

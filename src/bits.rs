@@ -7,3 +7,17 @@ impl Bit for u32 {
         (*self >> bit) != 0
     }
 }
+
+pub trait Bits {
+    type T;
+
+    fn bits(&self, start: usize, size: usize) -> Self::T;
+}
+
+impl Bits for u32 {
+    type T = u32;
+
+    fn bits(&self, start: usize, size: usize) -> Self::T {
+        (self >> start) & !(0xffffffff << size)
+    }
+}
