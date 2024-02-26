@@ -43,6 +43,9 @@ impl From<u32> for ShiftedOperand {
 
 pub struct ImmShiftedOperand {
     pub shift: u32,
+
+    // TODO: Create an Imm struct to assert at runtime that the immediate
+    // fits within n bits.
     pub rotated: u32,
 }
 
@@ -51,7 +54,7 @@ impl From<u32> for ImmShiftedOperand {
         let shift = value.bits(8, 4) * 2;
         Self {
             shift,
-            rotated: value.rotate_right(shift),
+            rotated: value.bits(0, 8).rotate_right(shift),
         }
     }
 }
@@ -87,6 +90,7 @@ impl From<u32> for RegShiftedOperand {
     }
 }
 
+#[derive(Debug)]
 pub enum DataProcessingOpcode {
     And,
     Eor,
@@ -107,15 +111,15 @@ pub enum DataProcessingOpcode {
 }
 
 impl DataProcessingOpcode {
-    fn uses_destination(&self) -> bool {
+    pub fn uses_destination(&self) -> bool {
         !matches!(self, Self::Tst | Self::Teq | Self::Cmp | Self::Cmn)
     }
 
-    fn uses_carry(&self) -> bool {
+    pub fn uses_carry(&self) -> bool {
         matches!(self, Self::Adc | Self::Sbc | Self::Rsc)
     }
 
-    fn uses_lhs(&self) -> bool {
+    pub fn uses_lhs(&self) -> bool {
         !matches!(self, Self::Mov | Self::Mvn)
     }
 }
@@ -145,6 +149,7 @@ impl From<u32> for DataProcessingOpcode {
 }
 
 pub struct DataProcessing {
+    pub rd: u8,
     pub set_flags: bool,
     pub opcode: DataProcessingOpcode,
     pub operand: ShiftedOperand,
@@ -153,6 +158,7 @@ pub struct DataProcessing {
 impl From<u32> for DataProcessing {
     fn from(value: u32) -> Self {
         Self {
+            rd: value.bits(12, 4) as u8,
             set_flags: value.bit(20),
             opcode: DataProcessingOpcode::from(value.bits(21, 4)),
             operand: ShiftedOperand::from(value),
