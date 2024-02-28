@@ -73,7 +73,6 @@ impl Decoder {
     }
 
     pub fn call_arm<V: Visitor>(&self, inst: u32, visitor: &mut V) {
-        println!("{:#08x}", inst);
         let index = Self::arm_index(inst);
         match self.arm_table[index] {
             ArmInstructionType::DataProcessing => visitor.arm_data_processing(DataProcessing::from(inst)),

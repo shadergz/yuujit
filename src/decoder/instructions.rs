@@ -1,9 +1,77 @@
+use std::fmt;
+
 use crate::bits::{Bit, Bits};
 
 #[derive(Clone, Copy)]
 pub enum ArmInstructionType {
     DataProcessing,
     Illegal,
+}
+
+pub enum Condition {
+    Eq,
+    Ne,
+    Cs,
+    Cc,
+    Mi,
+    Pl,
+    Vs,
+    Vc,
+    Hi,
+    Ls,
+    Ge,
+    Lt,
+    Gt,
+    Le,
+    Al,
+    Nv,
+}
+
+impl fmt::Display for Condition {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Condition::Eq => todo!(),
+            Condition::Ne => todo!(),
+            Condition::Cs => todo!(),
+            Condition::Cc => todo!(),
+            Condition::Mi => todo!(),
+            Condition::Pl => todo!(),
+            Condition::Vs => todo!(),
+            Condition::Vc => todo!(),
+            Condition::Hi => todo!(),
+            Condition::Ls => todo!(),
+            Condition::Ge => todo!(),
+            Condition::Lt => todo!(),
+            Condition::Gt => todo!(),
+            Condition::Le => todo!(),
+            Condition::Al => write!(f, ""),
+            Condition::Nv => todo!(),
+        }
+    }
+}
+
+impl From<u32> for Condition {
+    fn from(value: u32) -> Self {
+        match value {
+            0 => Condition::Eq,
+            1 => Condition::Ne,
+            2 => Condition::Cs,
+            3 => Condition::Cc,
+            4 => Condition::Mi,
+            5 => Condition::Pl,
+            6 => Condition::Vs,
+            7 => Condition::Vc,
+            8 => Condition::Hi,
+            9 => Condition::Ls,
+            10 => Condition::Ge,
+            11 => Condition::Lt,
+            12 => Condition::Gt,
+            13 => Condition::Le,
+            14 => Condition::Al,
+            15 => Condition::Nv,
+            _ => unimplemented!(),
+        }
+    }
 }
 
 pub enum ShiftType {
@@ -153,6 +221,7 @@ pub struct DataProcessing {
     pub set_flags: bool,
     pub opcode: DataProcessingOpcode,
     pub operand: ShiftedOperand,
+    pub condition: Condition,
 }
 
 impl From<u32> for DataProcessing {
@@ -162,6 +231,7 @@ impl From<u32> for DataProcessing {
             set_flags: value.bit(20),
             opcode: DataProcessingOpcode::from(value.bits(21, 4)),
             operand: ShiftedOperand::from(value),
+            condition: Condition::from(value.bits(28, 4)),
         }
     }
 }

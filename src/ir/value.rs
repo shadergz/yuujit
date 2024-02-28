@@ -1,4 +1,4 @@
-use std::{fmt::Debug, marker::PhantomData};
+use std::{fmt::{self, Debug}, marker::PhantomData};
 
 pub trait Type: Clone + Copy + Debug {
     fn bits() -> u32;
@@ -43,12 +43,25 @@ impl Type for U32 {
 #[derive(Clone, Copy)]
 pub enum Value<T: Type> {
     Imm(u32, PhantomData<T>),
-    Var(usize, PhantomData<T>),
+    Var(u32, PhantomData<T>),
 }
 
-impl<T: Type> From<u32> for Value<T> {
-    fn from(value: u32) -> Self {
-        assert!(value < T::bits() * 2);
+impl<T: Type> Value<T> {
+    pub fn from_imm(value: u32) -> Self {
+        assert!((value as u64) < ((1 as u64) << T::bits()));
         Self::Imm(value, PhantomData)
+    }
+
+    pub fn from_var(id: u32) -> Self {
+        Self::Var(id, PhantomData)
+    }
+}
+
+impl<T: Type> fmt::Display for Value<T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Imm(imm, _) => write!(f, "{:#x}", imm),
+            Self::Var(id, _) => write!(f, "v{id}"),
+        }
     }
 }

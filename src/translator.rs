@@ -1,4 +1,4 @@
-use crate::{decoder::{instructions::{DataProcessing, DataProcessingOpcode, ImmShiftedOperand, ShiftedOperand}, visitor::Visitor}, ir::{emitter::Emitter, value::{Type, Value, U1, U32}}};
+use crate::{decoder::{instructions::{DataProcessing, DataProcessingOpcode, ImmShiftedOperand, ShiftedOperand}, visitor::Visitor}, ir::{block::Block, emitter::Emitter, value::{Type, Value, U1, U32}}};
 
 pub struct Translator {
     ir: Emitter,
@@ -11,10 +11,14 @@ impl Translator {
         }
     }
 
-    pub fn emit_imm_shift(&mut self, operand: ImmShiftedOperand, set_carry: bool) -> (Value<U32>, Value<U1>) {
-        let rotated = Value::from(operand.rotated);
+    pub fn consume(self) -> Block {
+        self.ir.consume()
+    }
+
+    pub fn emit_imm_shift(&mut self, operand: ImmShiftedOperand, set_carry: bool) -> (Value<U32>, Value<U32>) {
+        let rotated = Value::from_imm(operand.rotated);
         if set_carry {
-            (rotated, Value::from(operand.rotated >> 31))
+            (rotated, Value::from_imm(operand.rotated >> 31))
         } else {
             (rotated, self.ir.load_c())
         }
@@ -34,7 +38,7 @@ impl Visitor for Translator {
             DataProcessingOpcode::Mov => {
                 let result = self.ir.copy(rhs);
                 if set_flags {
-                    self.ir.store_nzc(result, carry);
+                    self.ir.store_nz(result);
                 }
 
                 Some(result)

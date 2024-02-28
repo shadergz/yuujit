@@ -1,4 +1,4 @@
-use crate::{block_descriptor::BlockDescriptor, config::Config, decoder::Decoder, guest_memory::GuestMemory, ir::block::Block, state::State, translator::Translator};
+use crate::{block_descriptor::BlockDescriptor, config::Config, decoder::Decoder, disassembler::Disassembler, guest_memory::GuestMemory, ir::block::Block, state::State, translator::Translator};
 
 pub struct Jit<T: GuestMemory> {
     config: Config,
@@ -22,20 +22,21 @@ impl<T: GuestMemory> Jit<T> {
     pub fn run(&mut self, cycles: usize) {
         for _ in 0..cycles {
             let descriptor = BlockDescriptor::from(&self.state);
-
             let mut translator = Translator::new();
+            let mut disassembler = Disassembler::new();
 
-            for i in 0..self.config.block_size_limit {
-                let addr = descriptor.addr();
-                if descriptor.is_arm() {
-                    let data = self.memory.read_word(addr);
-                    self.decoder.call_arm(data, &mut translator);
-                    todo!("data {:#08x}", data)
-                } else {
-                    todo!("handle thumb")
-                }
+            let addr = descriptor.addr();
+            if descriptor.is_arm() {
+                let data = self.memory.read_word(addr);
+                self.decoder.call_arm(data, &mut disassembler);
+                self.decoder.call_arm(data, &mut translator);
+            } else {
+                todo!("handle thumb")
             }
 
+            let block = translator.consume();
+            println!("{}", block);
+            todo!("done");
 
             // let block = self.translate(descriptor);
             // lookup block based on current state to form descriptor

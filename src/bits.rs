@@ -4,7 +4,7 @@ pub trait Bit {
 
 impl Bit for u32 {
     fn bit(&self, bit: usize) -> bool {
-        (*self >> bit) != 0
+        (*self >> bit) & 0x1 != 0
     }
 }
 
