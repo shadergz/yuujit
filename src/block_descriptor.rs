@@ -2,7 +2,7 @@ use crate::state::State;
 
 // Any block can be identified by the pc, mode bits and thumb bit.
 // To encode this efficiently we use a u64.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct BlockDescriptor(u64);
 
 impl BlockDescriptor {

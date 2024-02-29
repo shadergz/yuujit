@@ -9,3 +9,4 @@ pub mod decoder;
 pub mod bits;
 pub mod translator;
 pub mod disassembler;
+pub mod ir_interpreter;

@@ -38,7 +38,7 @@ impl Visitor for Translator {
             DataProcessingOpcode::Mov => {
                 let result = self.ir.copy(rhs);
                 if set_flags {
-                    self.ir.store_nz(result);
+                    self.ir.store_nzc(result, carry);
                 }
 
                 Some(result)

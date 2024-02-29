@@ -20,12 +20,20 @@ pub struct Copy {
 
 pub struct LoadFlags {
     pub dst: Value<U32>,
+
+    // TODO: do we need this?
     pub mask: Value<U32>,
 }
 
 pub struct StoreFlags {
-    pub src: Value<U32>,
-    pub mask: Value<U32>,
+    // Optionally used for calculating n and z flags
+    pub src: Option<Value<U32>>,
+
+    // Optionally used for c flag
+    pub carry: Option<Value<U32>>,
+
+    // Optionally used for v flag
+    pub overflow: Option<Value<U32>>,
 }
 
 pub struct StoreGpr {

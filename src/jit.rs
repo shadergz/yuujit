@@ -1,4 +1,4 @@
-use crate::{block_descriptor::BlockDescriptor, config::Config, decoder::Decoder, disassembler::Disassembler, guest_memory::GuestMemory, ir::block::Block, state::State, translator::Translator};
+use crate::{backend::Backend, block_descriptor::BlockDescriptor, config::Config, decoder::Decoder, disassembler::Disassembler, guest_memory::GuestMemory, ir::block::Block, ir_interpreter::IrInterpreter, state::State, translator::Translator};
 
 pub struct Jit<T: GuestMemory> {
     config: Config,
@@ -6,6 +6,7 @@ pub struct Jit<T: GuestMemory> {
     state: State,
     cycles_left: usize,
     decoder: Decoder,
+    backend: IrInterpreter,
 }
 
 impl<T: GuestMemory> Jit<T> {
@@ -16,6 +17,7 @@ impl<T: GuestMemory> Jit<T> {
             state: State::default(),
             cycles_left: 0,
             decoder: Decoder::new(),
+            backend: IrInterpreter::new(),
         }
     }
 
@@ -24,6 +26,8 @@ impl<T: GuestMemory> Jit<T> {
             let descriptor = BlockDescriptor::from(&self.state);
             let mut translator = Translator::new();
             let mut disassembler = Disassembler::new();
+            
+            assert_eq!(self.backend.has_code_at(descriptor), false);
 
             let addr = descriptor.addr();
             if descriptor.is_arm() {
@@ -36,29 +40,8 @@ impl<T: GuestMemory> Jit<T> {
 
             let block = translator.consume();
             println!("{}", block);
-            todo!("done");
-
-            // let block = self.translate(descriptor);
-            // lookup block based on current state to form descriptor
-            // if block doesn't exist, then compile new block
-
-            // when compiling new block:
-            // call a translate function which returns us a basic block
-            // in translate function:
-            // find starting pc
-            // continually read and decode instructions until a terminating instruction is found (e.g. branch)
-            // for each decoded instruction emit some ir into the basic block
-            // then return the basic block
-            // once the block is returned we can run the optimiser over the basic block
-            // this is where i want to spend more time figuring out cool ways to optimise
-            
-            // afterwards we can then use a struct that implements Backend to compile the ir
-            // into machine code or interpret it
-
-            // there's no need to cache the basic blocks, as they get compiled into something else later on
+            self.backend.compile(block);
         }
-
-        todo!()
     }
 
     pub fn state(&self) -> &State {

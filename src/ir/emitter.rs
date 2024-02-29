@@ -5,6 +5,11 @@ pub struct Emitter {
     current_var: u32,
 }
 
+const FLAG_N: u32 = 1 << 31;
+const FLAG_Z: u32 = 1 << 30;
+const FLAG_C: u32 = 1 << 29;
+const FLAG_V: u32 = 1 << 28;
+
 impl Emitter {
     pub fn new() -> Self {
         Self {
@@ -35,10 +40,11 @@ impl Emitter {
         dst
     }
 
-    pub fn store_nz(&mut self, src: Value<U32>) {
+    pub fn store_nzc(&mut self, src: Value<U32>, carry: Value<U32>) {
         self.opcodes.push(Opcode::StoreFlags(StoreFlags {
-            src,
-            mask: Value::from_imm(0xc0000000),
+            src: Some(src),
+            carry: Some(carry),
+            overflow: None,
         }));
     }
 
@@ -46,7 +52,7 @@ impl Emitter {
         let dst = self.create_var();
         self.opcodes.push(Opcode::LoadFlags(LoadFlags {
             dst,
-            mask: Value::from_imm(0x20000000),
+            mask: Value::from_imm(FLAG_C),
         }));
 
         dst
