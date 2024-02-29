@@ -35,6 +35,29 @@ impl Visitor for Translator {
         };
 
         let result = match inst.opcode {
+            DataProcessingOpcode::And => todo!(),
+            DataProcessingOpcode::Eor => todo!(),
+            DataProcessingOpcode::Sub => todo!(),
+            DataProcessingOpcode::Rsb => todo!(),
+            DataProcessingOpcode::Add => {
+                // TODO: clean this up
+                let lhs = self.ir.load_gpr(inst.rn);
+                if set_flags {
+                    let (result, carry, overflow) = self.ir.add_with_flags(lhs, rhs);
+                    self.ir.store_nzcv(result, carry, overflow);
+                    Some(result)
+                } else {
+                    Some(self.ir.add(lhs, rhs))
+                }
+            },
+            DataProcessingOpcode::Adc => todo!(),
+            DataProcessingOpcode::Sbc => todo!(),
+            DataProcessingOpcode::Rsc => todo!(),
+            DataProcessingOpcode::Tst => todo!(),
+            DataProcessingOpcode::Teq => todo!(),
+            DataProcessingOpcode::Cmp => todo!(),
+            DataProcessingOpcode::Cmn => todo!(),
+            DataProcessingOpcode::Orr => todo!(),
             DataProcessingOpcode::Mov => {
                 let result = self.ir.copy(rhs);
                 if set_flags {
@@ -43,7 +66,8 @@ impl Visitor for Translator {
 
                 Some(result)
             },
-            _ => todo!("handle {:?}", inst.opcode),
+            DataProcessingOpcode::Bic => todo!(),
+            DataProcessingOpcode::Mvn => todo!(),
         };
 
         if let Some(result) = result {

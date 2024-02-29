@@ -11,7 +11,10 @@ pub enum Opcode {
     Copy(Copy),
     LoadFlags(LoadFlags),
     StoreFlags(StoreFlags),
+    LoadGpr(LoadGpr),
     StoreGpr(StoreGpr),
+    AddWithFlags(AddWithFlags),
+    Add(Add),
 }
 
 #[derive(Clone, Copy)]
@@ -41,6 +44,12 @@ pub struct StoreFlags {
 }
 
 #[derive(Clone, Copy)]
+pub struct LoadGpr {
+    pub dst: Value<U32>,
+    pub src: GuestReg,
+}
+
+#[derive(Clone, Copy)]
 pub struct StoreGpr {
     pub dst: GuestReg,
     pub src: Value<U32>,
@@ -49,6 +58,22 @@ pub struct StoreGpr {
 #[derive(Clone, Copy)]
 pub struct LoadCpsr {
     pub dst: Value<U32>,
+}
+
+#[derive(Clone, Copy)]
+pub struct AddWithFlags {
+    pub dst: Value<U32>,
+    pub carry: Value<U32>,
+    pub overflow: Value<U32>,
+    pub lhs: Value<U32>,
+    pub rhs: Value<U32>,
+}
+
+#[derive(Clone, Copy)]
+pub struct Add {
+    pub dst: Value<U32>,
+    pub lhs: Value<U32>,
+    pub rhs: Value<U32>,
 }
 
 impl fmt::Display for Opcode {
@@ -67,7 +92,10 @@ impl fmt::Display for Opcode {
                 Ok(())
             },
             Opcode::StoreFlags(opcode) => todo!(),
-            Opcode::StoreGpr(opcode) => write!(f, "store_gpr r{}, {}", opcode.dst, opcode.src),
+            Opcode::LoadGpr(opcode) => write!(f, "{} = load.gpr r{}", opcode.dst, opcode.src),
+            Opcode::StoreGpr(opcode) => write!(f, "store.gpr r{}, {}", opcode.dst, opcode.src),
+            Opcode::AddWithFlags(opcode) => todo!(),
+            Opcode::Add(opcode) => write!(f, "{} = add {}, {}", opcode.dst, opcode.lhs, opcode.rhs),
         }
     }
 }

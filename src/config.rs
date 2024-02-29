@@ -7,7 +7,7 @@ pub struct Config {
 impl Default for Config {
     fn default() -> Self {
         Self {
-            block_size_limit: 1,
+            block_size_limit: 2,
         }
     }
 }

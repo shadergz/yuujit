@@ -218,6 +218,7 @@ impl From<u32> for DataProcessingOpcode {
 
 pub struct DataProcessing {
     pub rd: u8,
+    pub rn: u8,
     pub set_flags: bool,
     pub opcode: DataProcessingOpcode,
     pub operand: ShiftedOperand,
@@ -228,6 +229,7 @@ impl From<u32> for DataProcessing {
     fn from(value: u32) -> Self {
         Self {
             rd: value.bits(12, 4) as u8,
+            rn: value.bits(16, 4) as u8,
             set_flags: value.bit(20),
             opcode: DataProcessingOpcode::from(value.bits(21, 4)),
             operand: ShiftedOperand::from(value),

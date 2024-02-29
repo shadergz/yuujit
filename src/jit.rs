@@ -23,12 +23,19 @@ impl<T: GuestMemory> Jit<T> {
 
     pub fn run(&mut self, cycles: usize) {
         for _ in 0..cycles {
-            let descriptor = BlockDescriptor::from(&self.state);
-            let mut translator = Translator::new(descriptor);
-            let mut disassembler = Disassembler::new();
-            
-            assert_eq!(self.backend.has_code_at(descriptor), false);
+            let mut descriptor = BlockDescriptor::from(&self.state);
+            if !self.backend.has_code_at(descriptor) {
+                self.translate(&mut descriptor);
+            }
 
+            self.backend.run(descriptor, &mut self.state);
+        }
+    }
+
+    fn translate(&mut self, descriptor: &mut BlockDescriptor) {
+        let mut translator = Translator::new(*descriptor);
+        let mut disassembler = Disassembler::new();
+        for _ in 0..self.config.block_size_limit {
             let addr = descriptor.addr();
             if descriptor.is_arm() {
                 let data = self.memory.read_word(addr);
@@ -38,11 +45,13 @@ impl<T: GuestMemory> Jit<T> {
                 todo!("handle thumb")
             }
 
-            let block = translator.consume();
-            println!("{}", block);
-            self.backend.compile(descriptor, block);
-            self.backend.run(descriptor, &mut self.state);
+            // TODO: reduce number of advance calls (we already call advance in the individual opcodes when advance the pc)
+            descriptor.advance();
         }
+        
+        let block = translator.consume();
+        println!("{}", block);
+        self.backend.compile(*descriptor, block);
     }
 
     pub fn state(&self) -> &State {

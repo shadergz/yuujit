@@ -56,12 +56,22 @@ impl Backend for IrInterpreter {
                     let src = u32::from(state.cpsr);
                     self.assign(opcode.dst, src);
                 },
-                Opcode::StoreFlags(opcode) => todo!(),
+                Opcode::StoreFlags(_) => todo!(),
                 Opcode::StoreGpr(opcode) => {
                     let src = self.resolve(opcode.src);
 
                     // TODO: deal with modes
                     state.gpr[opcode.dst as usize] = src;
+                },
+                Opcode::LoadGpr(opcode) => {
+                    let src = state.gpr[opcode.src as usize];
+                    self.assign(opcode.dst, src);
+                },
+                Opcode::AddWithFlags(_) => todo!(),
+                Opcode::Add(opcode) => {
+                    let lhs = self.resolve(opcode.lhs);
+                    let rhs = self.resolve(opcode.rhs);
+                    self.assign(opcode.dst, lhs + rhs);
                 },
             }
         }

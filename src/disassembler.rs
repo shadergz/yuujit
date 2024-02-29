@@ -27,7 +27,7 @@ impl Visitor for Disassembler {
             DataProcessingOpcode::Eor => todo!(),
             DataProcessingOpcode::Sub => todo!(),
             DataProcessingOpcode::Rsb => todo!(),
-            DataProcessingOpcode::Add => todo!(),
+            DataProcessingOpcode::Add => println!("add{}{} r{}, r{}, {}", inst.condition, set_flags, inst.rd, inst.rn, rhs),
             DataProcessingOpcode::Adc => todo!(),
             DataProcessingOpcode::Sbc => todo!(),
             DataProcessingOpcode::Rsc => todo!(),

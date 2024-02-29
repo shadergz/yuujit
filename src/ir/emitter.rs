@@ -1,6 +1,6 @@
 use crate::block_descriptor::BlockDescriptor;
 
-use super::{block::Block, opcode::{Copy, LoadFlags, Opcode, StoreFlags, StoreGpr}, value::{Type, Value, U1, U32}};
+use super::{block::Block, opcode::{Add, AddWithFlags, Copy, LoadFlags, LoadGpr, Opcode, StoreFlags, StoreGpr}, value::{Type, Value, U1, U32}};
 
 pub struct Emitter {
     opcodes: Vec<Opcode>,
@@ -52,11 +52,29 @@ impl Emitter {
         }));
     }
 
+    pub fn store_nzcv(&mut self, src: Value<U32>, carry: Value<U32>, overflow: Value<U32>) {
+        self.opcodes.push(Opcode::StoreFlags(StoreFlags {
+            src: Some(src),
+            carry: Some(carry),
+            overflow: Some(overflow),
+        }));
+    }
+
     pub fn load_c(&mut self) -> Value<U32> {
         let dst = self.create_var();
         self.opcodes.push(Opcode::LoadFlags(LoadFlags {
             dst,
             mask: Value::from_imm(FLAG_C),
+        }));
+
+        dst
+    }
+
+    pub fn load_gpr(&mut self, src: u8) -> Value<U32> {
+        let dst = self.create_var();
+        self.opcodes.push(Opcode::LoadGpr(LoadGpr {
+            dst,
+            src,
         }));
 
         dst
@@ -69,8 +87,34 @@ impl Emitter {
         }));
     }
 
+    pub fn add_with_flags(&mut self, lhs: Value<U32>, rhs: Value<U32>) -> (Value<U32>, Value<U32>, Value<U32>) {
+        let dst = self.create_var();
+        let carry = self.create_var();
+        let overflow = self.create_var();
+        self.opcodes.push(Opcode::AddWithFlags(AddWithFlags {
+            dst,
+            carry,
+            overflow,
+            lhs,
+            rhs,
+        }));
+
+        (dst, carry, overflow)
+    }
+
+    pub fn add(&mut self, lhs: Value<U32>, rhs: Value<U32>) -> Value<U32> {
+        let dst = self.create_var();
+        self.opcodes.push(Opcode::Add(Add {
+            dst,
+            lhs,
+            rhs,
+        }));
+
+        dst
+    }
+
     pub fn advance_pc(&mut self) {
-        self.descriptor = self.descriptor.advance();
+        self.descriptor.advance();
         self.store_gpr(15, Value::from_imm(self.descriptor.addr()));
     }
 }
