@@ -6,6 +6,7 @@ use super::value::{Value, U1, U32, U8};
 
 pub type GuestReg = u8;
 
+#[derive(Clone, Copy)]
 pub enum Opcode {
     Copy(Copy),
     LoadFlags(LoadFlags),
@@ -13,11 +14,13 @@ pub enum Opcode {
     StoreGpr(StoreGpr),
 }
 
+#[derive(Clone, Copy)]
 pub struct Copy {
     pub dst: Value<U32>,
     pub src: Value<U32>,
 }
 
+#[derive(Clone, Copy)]
 pub struct LoadFlags {
     pub dst: Value<U32>,
 
@@ -25,6 +28,7 @@ pub struct LoadFlags {
     pub mask: Value<U32>,
 }
 
+#[derive(Clone, Copy)]
 pub struct StoreFlags {
     // Optionally used for calculating n and z flags
     pub src: Option<Value<U32>>,
@@ -36,11 +40,13 @@ pub struct StoreFlags {
     pub overflow: Option<Value<U32>>,
 }
 
+#[derive(Clone, Copy)]
 pub struct StoreGpr {
     pub dst: GuestReg,
     pub src: Value<U32>,
 }
 
+#[derive(Clone, Copy)]
 pub struct LoadCpsr {
     pub dst: Value<U32>,
 }

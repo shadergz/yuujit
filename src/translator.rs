@@ -1,13 +1,13 @@
-use crate::{decoder::{instructions::{DataProcessing, DataProcessingOpcode, ImmShiftedOperand, ShiftedOperand}, visitor::Visitor}, ir::{block::Block, emitter::Emitter, value::{Type, Value, U1, U32}}};
+use crate::{block_descriptor::BlockDescriptor, decoder::{instructions::{DataProcessing, DataProcessingOpcode, ImmShiftedOperand, ShiftedOperand}, visitor::Visitor}, ir::{block::Block, emitter::Emitter, value::{Type, Value, U1, U32}}};
 
 pub struct Translator {
     ir: Emitter,
 }
 
 impl Translator {
-    pub fn new() -> Self {
+    pub fn new(descriptor: BlockDescriptor) -> Self {
         Self {
-            ir: Emitter::new(),
+            ir: Emitter::new(descriptor),
         }
     }
 
@@ -49,5 +49,7 @@ impl Visitor for Translator {
         if let Some(result) = result {
             self.ir.store_gpr(inst.rd, result);
         }
+
+        self.ir.advance_pc();
     }
 }

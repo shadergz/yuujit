@@ -13,6 +13,13 @@ impl BlockDescriptor {
     pub fn is_arm(&self) -> bool {
         (self.0 >> 36) & 0x1 == 0
     }
+
+    pub fn advance(self) -> BlockDescriptor {
+        let step = if self.is_arm() { 4 } else { 2 };
+        let addr = self.addr() + step;
+        let value = (self.0 & !0x7fffffff) | (addr >> 1) as u64;
+        BlockDescriptor(value)
+    }
 }
 
 impl From<&State> for BlockDescriptor {

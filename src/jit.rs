@@ -24,7 +24,7 @@ impl<T: GuestMemory> Jit<T> {
     pub fn run(&mut self, cycles: usize) {
         for _ in 0..cycles {
             let descriptor = BlockDescriptor::from(&self.state);
-            let mut translator = Translator::new();
+            let mut translator = Translator::new(descriptor);
             let mut disassembler = Disassembler::new();
             
             assert_eq!(self.backend.has_code_at(descriptor), false);
@@ -40,7 +40,8 @@ impl<T: GuestMemory> Jit<T> {
 
             let block = translator.consume();
             println!("{}", block);
-            self.backend.compile(block);
+            self.backend.compile(descriptor, block);
+            self.backend.run(descriptor, &mut self.state);
         }
     }
 

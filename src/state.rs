@@ -23,6 +23,7 @@ impl From<Mode> for u32 {
     }
 }
 
+#[derive(Clone, Copy)]
 pub struct StatusRegister {
     pub mode: Mode,
     pub t: bool,
@@ -48,6 +49,22 @@ impl Default for StatusRegister {
             z: false,
             n: false,
         }
+    }
+}
+
+impl From<StatusRegister> for u32 {
+    fn from(value: StatusRegister) -> Self {
+        let mut result = 0;
+        result |= u32::from(value.mode);
+        result |= (value.t as u32) << 5;
+        result |= (value.f as u32) << 6;
+        result |= (value.i as u32) << 7;
+        result |= (value.q as u32) << 27;
+        result |= (value.v as u32) << 28;
+        result |= (value.c as u32) << 29;
+        result |= (value.z as u32) << 30;
+        result |= (value.n as u32) << 31;
+        result
     }
 }
 

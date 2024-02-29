@@ -1,8 +1,11 @@
+use crate::block_descriptor::BlockDescriptor;
+
 use super::{block::Block, opcode::{Copy, LoadFlags, Opcode, StoreFlags, StoreGpr}, value::{Type, Value, U1, U32}};
 
 pub struct Emitter {
     opcodes: Vec<Opcode>,
     current_var: u32,
+    descriptor: BlockDescriptor,
 }
 
 const FLAG_N: u32 = 1 << 31;
@@ -11,10 +14,11 @@ const FLAG_C: u32 = 1 << 29;
 const FLAG_V: u32 = 1 << 28;
 
 impl Emitter {
-    pub fn new() -> Self {
+    pub fn new(descriptor: BlockDescriptor) -> Self {
         Self {
             opcodes: Vec::new(),
             current_var: 0,
+            descriptor,
         }
     }
 
@@ -63,5 +67,10 @@ impl Emitter {
             dst,
             src,
         }));
+    }
+
+    pub fn advance_pc(&mut self) {
+        self.descriptor = self.descriptor.advance();
+        self.store_gpr(15, Value::from_imm(self.descriptor.addr()));
     }
 }

@@ -2,6 +2,7 @@ use std::fmt;
 
 use super::opcode::Opcode;
 
+#[derive(Clone)]
 pub struct Block {
     pub opcodes: Vec<Opcode>,
 }
