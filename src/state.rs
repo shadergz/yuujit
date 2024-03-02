@@ -9,6 +9,12 @@ pub enum Mode {
     Sys,
 }
 
+impl Mode {
+    pub fn is_banked(&self) -> bool {
+        !matches!(self, Self::Usr | Self::Sys)
+    }
+}
+
 impl From<Mode> for u32 {
     fn from(mode: Mode) -> Self {
         match mode {
@@ -71,5 +77,6 @@ impl From<StatusRegister> for u32 {
 #[derive(Default)]
 pub struct State {
     pub gpr: [u32; 32],
+    pub gpr_banked: [[u32; 7]; 6],
     pub cpsr: StatusRegister,
 }
