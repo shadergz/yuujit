@@ -73,7 +73,7 @@ impl<T: GuestMemory> Jit<T> {
         };
 
         if mode.is_banked() && gpr >= start && gpr <= 14 {
-            self.state.gpr_banked[u32::from(mode) as usize][gpr - 8] = value;
+            self.state.gpr_banked[mode.as_bank()][gpr - 8] = value;
         } else {
             self.state.gpr[gpr] = value;
         }
