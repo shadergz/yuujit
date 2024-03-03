@@ -76,7 +76,7 @@ impl Decoder {
         let index = Self::arm_index(inst);
         match self.arm_table[index] {
             ArmInstructionType::DataProcessing => visitor.arm_data_processing(DataProcessing::from(inst)),
-            ArmInstructionType::Illegal => todo!(),
+            ArmInstructionType::Illegal => todo!("handle instruction {:#010x}", inst),
         }
     }
 
