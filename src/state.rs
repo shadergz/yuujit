@@ -13,6 +13,17 @@ impl Mode {
     pub fn is_banked(&self) -> bool {
         !matches!(self, Self::Usr | Self::Sys)
     }
+
+    pub fn as_bank(&self) -> usize {
+        match self {
+            Self::Usr | Self::Sys => 0,
+            Self::Fiq => 1,
+            Self::Irq => 2,
+            Self::Svc => 3,
+            Self::Abt => 4,
+            Self::Und => 5,
+        }
+    }
 }
 
 impl From<Mode> for u32 {
