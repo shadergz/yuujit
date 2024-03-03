@@ -4,6 +4,9 @@ use crate::bits::{Bit, Bits};
 
 #[derive(Clone, Copy)]
 pub enum ArmInstructionType {
+    BranchExchange,
+    BranchLinkExchangeRegister,
+    BranchLinkMaybeExchange,
     DataProcessing,
     Illegal,
 }

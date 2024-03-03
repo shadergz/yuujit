@@ -54,7 +54,9 @@ impl Decoder {
         let mut arm_table = [ArmInstructionType::Illegal; 4096];
         let mut i = 0;
         while i < arm_table.len() {
-            if Self::matches_pattern(i, "....00..........................") {
+            if Self::matches_pattern(i, "....101.........................") {
+                arm_table[i] = ArmInstructionType::BranchLinkMaybeExchange;
+            } else if Self::matches_pattern(i, "....00..........................") {
                 arm_table[i] = ArmInstructionType::DataProcessing;
             } else {
                 arm_table[i] = ArmInstructionType::Illegal;
@@ -75,6 +77,9 @@ impl Decoder {
     pub fn call_arm<V: Visitor>(&self, inst: u32, visitor: &mut V) {
         let index = Self::arm_index(inst);
         match self.arm_table[index] {
+            ArmInstructionType::BranchExchange => todo!(),
+            ArmInstructionType::BranchLinkExchangeRegister => todo!(),
+            ArmInstructionType::BranchLinkMaybeExchange => visitor.branch_link_maybe_exchange(),
             ArmInstructionType::DataProcessing => visitor.arm_data_processing(DataProcessing::from(inst)),
             ArmInstructionType::Illegal => todo!("handle instruction {:#010x}", inst),
         }
